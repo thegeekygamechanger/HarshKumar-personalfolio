@@ -237,15 +237,24 @@ const renderServices = (container, items) => {
 const renderSocials = (container, items) => {
   container.innerHTML = "";
   if (!items || items.length === 0) {
-    container.innerHTML = "<p class=\"muted\">Add social links in data/profile.json.</p>";
     return;
   }
+  
+  const emojiMap = {
+    LinkedIn: "💼",
+    GitHub: "🐙",
+    HackerRank: "🏆",
+    LeetCode: "💻"
+  };
+  
   items.forEach((item) => {
     const link = document.createElement("a");
     link.href = item.url || "#";
     link.target = "_blank";
     link.rel = "noreferrer";
-    link.textContent = item.label || "Link";
+    const emoji = emojiMap[item.label] || "🔗";
+    link.innerHTML = `<span class="social-emoji">${emoji}</span> ${item.label || "Link"}`;
+    link.className = "social-link";
     container.appendChild(link);
   });
 };
@@ -277,7 +286,6 @@ const renderProfile = (profile, source = "manual") => {
   setText("profileTagline", profile.tagline);
   setText("profileSummary", profile.summary);
   setText("profilePhone", profile.phone);
-  setLink("profileWebsite", profile.website);
 
   const email = byId("profileEmail");
   if (profile.email) {
@@ -304,7 +312,7 @@ const renderProfile = (profile, source = "manual") => {
   renderSkills(byId("skillsList"), profile.skills);
   renderServices(byId("servicesList"), profile.services);
   renderEducation(byId("educationList"), profile.education);
-  renderSocials(byId("socialLinks"), profile.socialLinks);
+  renderSocials(byId("socialMenu"), profile.socialLinks);
 };
 
 const loadProfile = async () => {
@@ -341,6 +349,206 @@ const initMenu = () => {
   });
 };
 
+const initDownloadResume = () => {
+  const downloadBtn = byId("downloadResume");
+  if (!downloadBtn) return;
+  downloadBtn.addEventListener("click", async () => {
+    try {
+      const response = await fetch("./assets/resume.pdf");
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const blob = await response.blob();
+      
+      // Check if blob is empty or not a PDF
+      if (blob.size === 0) throw new Error("Downloaded file is empty");
+      if (!blob.type.includes("pdf") && !blob.type.includes("octet-stream")) {
+        console.warn(`Unexpected mime type: ${blob.type}`);
+      }
+      
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "Harsh_Kumar_Resume.pdf";
+      document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(link);
+      }, 100);
+    } catch (error) {
+      console.error("Download error:", error);
+      alert("Unable to download resume. Please try again or contact support.");
+    }
+  });
+};
+
+const initSmoothScroll = () => {
+  const navLinks = document.querySelectorAll(".site-nav a");
+  if (!navLinks.length) return;
+  
+  navLinks.forEach((link) => {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      const targetId = link.getAttribute("href");
+      const targetSection = document.querySelector(targetId);
+      
+      if (!targetSection) return;
+      
+      const headerHeight = document.querySelector(".site-header")?.offsetHeight || 0;
+      const sectionTop = targetSection.getBoundingClientRect().top + window.scrollY;
+      const scrollPosition = sectionTop - headerHeight;
+      
+      window.scrollTo({
+        top: scrollPosition,
+        behavior: "smooth"
+      });
+      
+      targetSection.style.transition = "all 0.6s ease";
+      targetSection.style.backgroundColor = "rgba(255, 107, 61, 0.03)";
+      setTimeout(() => {
+        targetSection.style.backgroundColor = "transparent";
+      }, 1500);
+    });
+  });
+};
+
+const initSocialDropdown = () => {
+  const dropdown = document.querySelector(".social-dropdown");
+  const toggle = byId("socialToggle");
+  if (!toggle || !dropdown) return;
+  
+  toggle.addEventListener("click", () => {
+    dropdown.classList.toggle("open");
+  });
+  
+  document.addEventListener("click", (event) => {
+    if (!dropdown.contains(event.target)) {
+      dropdown.classList.remove("open");
+    }
+  });
+};
+
+const initContactForm = () => {
+  const form = byId("contactForm");
+  const modal = byId("contactFormModal");
+  const openBtn = byId("openContactForm");
+  const closeBtn = byId("contactFormClose");
+
+  if (!form || !modal || !openBtn || !closeBtn) return;
+
+  // Open modal
+  openBtn.addEventListener("click", () => {
+    modal.classList.add("is-open");
+    modal.setAttribute("aria-hidden", "false");
+  });
+
+  // Close modal
+  closeBtn.addEventListener("click", () => {
+    closeContactModal();
+  });
+
+  // Close on overlay click
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      closeContactModal();
+    }
+  });
+
+  // Form submission
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const name = byId("contactName").value;
+    const email = byId("contactEmail").value;
+    const message = byId("contactMessage").value;
+
+    if (!name || !email || !message) {
+      alert("Please fill all fields");
+      return;
+    }
+
+    try {
+      const timestamp = new Date().toISOString();
+      const response = {
+        name,
+        email,
+        message,
+        timestamp,
+      };
+
+      // Save to localStorage and assets folder
+      await saveContactResponse(response);
+
+      // Clear form
+      form.reset();
+
+      // Close modal
+      closeContactModal();
+
+      // Show thank you chip
+      showThankYouChip();
+    } catch (error) {
+      console.error("Form submission error:", error);
+      alert("Error submitting form. Please try again.");
+    }
+  });
+};
+
+const closeContactModal = () => {
+  const modal = byId("contactFormModal");
+  if (!modal) return;
+  modal.classList.remove("is-open");
+  modal.setAttribute("aria-hidden", "true");
+};
+
+const saveContactResponse = async (response) => {
+  // Store in localStorage as backup
+  const existing = JSON.parse(localStorage.getItem("contactResponses")) || [];
+  existing.push(response);
+  localStorage.setItem("contactResponses", JSON.stringify(existing));
+
+  // Save to backend (assets/contacts.json)
+  try {
+    const res = await fetch("/api/save-contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(response),
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      console.log("✅ Contact saved to server:", data);
+    } else {
+      console.error("Server error:", res.status);
+    }
+  } catch (error) {
+    console.log(
+      "⚠️ Backend not available - using localStorage only. Start server with: npm start",
+      error
+    );
+  }
+};
+
+const showThankYouChip = () => {
+  const chip = document.createElement("div");
+  chip.className = "thank-you-chip";
+  chip.textContent = "✨ Thank you for your message! We'll get back soon.";
+
+  document.body.appendChild(chip);
+
+  setTimeout(() => {
+    chip.classList.add("exit");
+    setTimeout(() => {
+      chip.remove();
+    }, 500);
+  }, 20000); // 20 seconds
+};
+
 initMenu();
+initDownloadResume();
+initSmoothScroll();
+initSocialDropdown();
+initContactForm();
 initHighlightsModal();
 loadProfile();

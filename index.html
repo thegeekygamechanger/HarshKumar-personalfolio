@@ -22,12 +22,12 @@
     </div>
 
     <header class="site-header" data-animate>
-      <div class="logo">Personal<span>folio</span></div>
+      <div class="logo">Harsh Kumar | Personal<span>folio</span></div>
       <nav class="site-nav">
-        <a href="#work">Work</a>
-        <a href="#experience">Experience</a>
-        <a href="#skills">Skills</a>
-        <a href="#contact">Contact</a>
+        <a href="#work">📁 Works</a>
+        <a href="#experience">💼 Experiences</a>
+        <a href="#skills">⚙️ Skills</a>
+        <a href="#contact">📧 Contact</a>
       </nav>
       <button class="mobile-toggle" aria-label="Toggle menu">Menu</button>
     </header>
@@ -51,13 +51,13 @@
               <span id="profileLocation"></span>
             </div>
             <div class="hero-actions">
-              <a class="button" href="#contact">Let’s collaborate</a>
-              <a class="button ghost" href="#work">View case studies</a>
+              <a class="button" href="#contact">🚀 Let's collaborate</a>
+              <a class="button ghost" id="downloadResume" href="javascript:void(0);">📄 Download Resume</a>
             </div>
           </div>
         </div>
         <div class="hero-card" data-animate>
-          <h3>Focus Snapshot</h3>
+          <h3>📊 Focus Snapshot</h3>
           <p>High signal product developer and full-stack execution for teams shipping on deadlines.</p>
           <div class="stats" id="stats"></div>
         </div>
@@ -65,20 +65,20 @@
 
       <section class="section split" id="highlights" data-section>
         <div class="section-title" data-animate>
-          <h2>Impact highlights</h2>
+          <h2>⭐ Impact highlights</h2>
           <p>Proof of velocity, scale, and measurable lifts.</p>
         </div>
         <div class="highlight-panel" data-animate>
           <ul class="highlight-list" id="highlightsList"></ul>
           <button class="button ghost highlight-more" id="highlightsMore" type="button" hidden>
-            Amazing stuffs ahead
+            🚀 Amazing stuffs ahead
           </button>
         </div>
       </section>
 
       <section class="section" id="work" data-section>
         <div class="section-title" data-animate>
-          <h2>Selected work</h2>
+          <h2>✨ Selected works</h2>
           <p>Launches that blended product strategy, motion, and engineering craftsmanship.</p>
         </div>
         <div class="cards" id="projectsGrid" data-animate></div>
@@ -86,7 +86,7 @@
 
       <section class="section" id="experience" data-section>
         <div class="section-title" data-animate>
-          <h2>Experience</h2>
+          <h2>🏃 Experiences</h2>
           <p>Cross-functional leadership across Cross-functional softwares and data products.</p>
         </div>
         <div class="timeline" id="experienceTimeline" data-animate></div>
@@ -94,7 +94,7 @@
 
       <section class="section split" id="skills" data-section>
         <div class="section-title" data-animate>
-          <h2>Capabilities</h2>
+          <h2>🔧 Capabilities</h2>
           <p>Built for scale, experimentation, and measurable outcomes.</p>
         </div>
         <div class="pill-grid" id="skillsList" data-animate></div>
@@ -102,7 +102,7 @@
 
       <section class="section split" id="services" data-section>
         <div class="section-title" data-animate>
-          <h2>How I help</h2>
+          <h2>🤝 How I help</h2>
           <p>Flexible engagement models for teams that need momentum fast.</p>
         </div>
         <div class="service-grid" id="servicesList" data-animate></div>
@@ -110,7 +110,7 @@
 
       <section class="section split" id="education" data-section>
         <div class="section-title" data-animate>
-          <h2>Education</h2>
+          <h2>🎓 Education</h2>
           <p>Academic foundations.</p>
         </div>
         <div class="education-list" id="educationList" data-animate></div>
@@ -118,29 +118,37 @@
 
       <section class="section contact" id="contact" data-section>
         <div class="section-title" data-animate>
-          <h2>Let’s build something bold</h2>
+          <h2>💡 Let's build something bold</h2>
           <p>Available for fractional development leadership, product strategy, and growth launches.</p>
         </div>
         <div class="contact-grid" data-animate>
-          <div>
-            <p class="contact-label">Email</p>
-            <a id="profileEmail" href="#">hello@example.com</a>
+          <div class="contact-item">
+            <p class="contact-label">✉️ Email</p>
+            <a id="profileEmail" href="#" class="contact-value">hello@example.com</a>
           </div>
-          <div>
-            <p class="contact-label">Phone</p>
-            <span id="profilePhone"></span>
+          <div class="contact-item">
+            <p class="contact-label">☎️ Phone</p>
+            <span id="profilePhone" class="contact-value"></span>
           </div>
-          <div>
-            <p class="contact-label">Website</p>
-            <a id="profileWebsite" href="#" target="_blank" rel="noreferrer"></a>
+          <div class="contact-item">
+            <p class="contact-label">🌐 Competitive view</p>
+            <div class="social-dropdown">
+              <button class="dropdown-toggle" id="socialToggle">
+                Select 🔗 
+                <i class="fas fa-chevron-down dropdown-icon"></i>
+              </button>
+              <div class="dropdown-menu" id="socialMenu"></div>
+            </div>
           </div>
         </div>
-        <div class="socials" id="socialLinks" data-animate></div>
+        <div style="display: flex; justify-content: center; margin-top: 2rem;">
+          <button class="button" id="openContactForm" style="font-size: 1rem;">📤 Send Message</button>
+        </div>
       </section>
 
       <section class="empty-state" id="emptyState" hidden>
         <h2>Portfolio is waiting for your data</h2>
-        <p>Add your profile details in <code>data/profile.json</code> to populate this page.</p>
+        <p>Add your profile details to populate this page.</p>
       </section>
     </main>
 
@@ -151,18 +159,41 @@
           Close
         </button>
         <div class="modal-content">
-          <h3>More highlights</h3>
+          <h3>✨ More highlights</h3>
           <ul class="modal-list" id="highlightsModalList"></ul>
         </div>
       </div>
     </div>
 
+    <div class="modal-overlay" id="contactFormModal" aria-hidden="true">
+      <div class="modal contact-modal">
+        <button class="modal-close" id="contactFormClose" type="button" aria-label="Close form">
+          Close
+        </button>
+        <div class="modal-content">
+          <h3>💌 Let's Connect</h3>
+          <form class="contact-form" id="contactForm">
+            <div class="form-group">
+              <input type="text" id="contactName" placeholder="Your name" required />
+            </div>
+            <div class="form-group">
+              <input type="email" id="contactEmail" placeholder="Your email" required />
+            </div>
+            <div class="form-group">
+              <textarea id="contactMessage" placeholder="Your message" rows="4" required></textarea>
+            </div>
+            <button type="submit" class="button button-small">📤 Send</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
     <footer class="site-footer">
-      <span>© 2026 Harsh Kumar @PersonalFolio.</span>
+      <p class="made-with-love">Made with ❤️ and 😊</p> <span>© 2026 Harsh Kumar @PersonalFolio.</span>
     </footer>
 
     <script>
-      window.__PROFILE_DATA__ = {"name":"Harsh Kumar","role":"Software Engineer | Data Science Enthusiast","location":"Pune, India","tagline":"Entry-level Software Dev with a Data-driven mindset and hands-on ML experience.","summary":"Motivated and analytical individual seeking an entry-level role in web development along with practical data science skills. I leverage analytics, ML, and full-stack engineering to deliver reliable, high-impact solutions.","profilePhoto":"/assets/profile.png","email":"harshkumargoluku2001@gmail.com","phone":"7547000491","website":"https://harshkumar-personalfolio.netlify.app/","stats":[{"label":"Experience","value":"1+ yrs"},{"label":"Projects","value":"Multiple"}],"highlights":["Smart India Hackathon 2020 - top 3 finalist (software category).","IIIT Pune Ideathon 2k22 - 1st position among 50 teams.","AIT Pune No-code Startup - finalist.","Smart India Hackathon 2023 - hardware category internal qualifier.","Built a JSON configuration editor in Angular, speeding form creation by 45%.","Optimized SQL retrieval to reduce redundant API calls.","Improved ML input quality with consistent preprocessing pipelines.","MIT CORER Solapur paper presentation - 1st position among 14 teams.","Innohacks 2.0 finalist among 2215 participants.","HackMITWPU finals - top 10 teams.","CodingNinja CodeKaze 2023 - top 15%.","Publication: i-kisaan paper published in IJCA.","Copyright: KitaabPadhoIndia (L-122712/2023).","Copyright: local drivers and riders app (L-135919/2023)."],"skills":["Python","SQL","Java","Angular 14/18","JavaScript","HTML","CSS",".NET Core 6","MySQL","MongoDB","TensorFlow","Keras","Scikit-learn","SLM","LLM","LangChain","LlamaIndex","Data Visualization","Data Cleaning","Statistical Analysis","Predictive Modeling","Fine-tuning","LoRA Training","RAG Systems","Git","Jupyter","VS Code","Visual Studio","PyCharm","Docker","Jenkins","AWS"],"services":["Web application development","Data science and analytics","LLM/RAG and Fine-Tuning models","Backend API optimization"],"projects":[{"name":"MrTouride","description":"Hackathon-winning VR tourism experience built with Unity and IoT integrations.","impact":"Reduced latency by about 30ms and improved immersion with touch-sense features.","link":"https://github.com/thegeekygamechanger/MrTouride.git"},{"name":"ApnaGPT","description":"GPT chatbot with RAG pipelines using LangChain and Streamlit.","impact":"Achieved BLEU 35 and ROUGE 0.5 with optimized LLaMA3 and Mistral flows.","link":"https://github.com/thegeekygamechanger/ApnaGPT.git"},{"name":"KitaabPadhoIndia","description":"Web portal for buying, selling, and renting study materials with LLM support.","impact":"Improved performance and scalability by 23%.","link":"https://github.com/thegeekygamechanger/kitaabpadho.git"},{"name":"Customer Churn Prediction","description":"ML app predicting churn with CatBoost and neural networks in Streamlit.","impact":"Reached 85% accuracy and improved results by 10% with tuning.","link":"https://github.com/thegeekygamechanger/Customer-churn-application.git"}],"experience":[{"role":"Associate Software Engineer","company":"Fusionstak LLC","period":"Nov 2024 - Mar 2025","summary":"Built backend APIs with .NET Core and EF Core plus Angular modules; delivered formly-based configuration editor improving form creation by 45%, optimized SQL retrieval, and reduced third-party API load times."},{"role":"Software Engineer Intern","company":"Centre for Development of Advanced Computing (CDAC)","period":"Jan 2024 - Jul 2024","summary":"Designed data pipelines for LLM projects, implemented preprocessing, enhanced retrieval with LangChain, and built scalable APIs for HPC environments."},{"role":"Software Development Intern","company":"Ministry of Housing and Urban Affairs, Govt. of India","period":"Apr 2023 - Jun 2023","summary":"Developed a digital services platform for local shopkeepers, used analytics to improve UX, and was selected among top 5 projects for senior officer presentation."},{"role":"Research and Development Engineer","company":"Eastern Royal Company","period":"Jul 2022 - May 2023","summary":"Implemented AWS storage solutions, analyzed datasets for insights, and strengthened hosting and analytics workflows."}],"education":[{"program":"Bachelor of Technology in Information Technology - 7.30 CGPA","school":"MIT ADT University","period":"Aug 2021 - Jul 2024"},{"program":"Diploma in Information Technology - 92.13%","school":"MIT WPU School of Polytechnic","period":"Aug 2018 - Aug 2021"},{"program":"Schooling 10th - 80%","school":"St. Judes Vidyalaya","period":"Mar 2017 - Apr 2018"}],"socialLinks":[{"label":"LinkedIn","url":"https://www.linkedin.com/in/harshkumarhk/"},{"label":"GitHub","url":"https://github.com/thegeekygamechanger"},{"label":"HackerRank","url":"https://www.hackerrank.com/profile/harshkumargoluk1"},{"label":"LeetCode","url":"https://leetcode.com/u/harshkumargoluku2001/"}]};
+      window.__PROFILE_DATA__ = {"name":"Harsh Kumar","role":"Software Engineer x Gen AI","location":"Pune, India","tagline":"Entry-level Software Dev with a Data-driven mindset and hands-on ML experience.","summary":"Motivated and analytical individual seeking an entry-level role in web development along with practical data science skills. I leverage analytics, ML, and full-stack engineering to deliver reliable, high-impact solutions.","profilePhoto":"/assets/profile.png","email":"harshkumargoluku2001@gmail.com","phone":"+91-7547000491","website":"https://harshkumar-personalfolio.netlify.app/","stats":[{"label":"Experience","value":"1+ yrs"},{"label":"Projects","value":"Gen AI, Web dev+"}],"highlights":["Smart India Hackathon 2020 - top 3 finalist (software category).","IIIT Pune Ideathon 2k22 - 1st position among 50 teams.","AIT Pune No-code Startup - finalist.","Smart India Hackathon 2023 - hardware category internal qualifier.","Built a JSON configuration editor in Angular, speeding form creation by 45%.","Optimized SQL retrieval to reduce redundant API calls.","Improved ML input quality with consistent preprocessing pipelines.","MIT CORER Solapur paper presentation - 1st position among 14 teams.","Innohacks 2.0 finalist among 2215 participants.","HackMITWPU finals - top 10 teams.","CodingNinja CodeKaze 2023 - top 15%.","Publication: i-kisaan paper published in IJCA.","Copyright: KitaabPadhoIndia (L-122712/2023).","Copyright: local drivers and riders app (L-135919/2023)."],"skills":["Python","SQL","Java","Angular 14/18","JavaScript","HTML","CSS",".NET Core 6","MySQL","MongoDB","TensorFlow","Keras","Scikit-learn","SLM","LLM","LangChain","LlamaIndex","Data Visualization","Data Cleaning","Statistical Analysis","Predictive Modeling","Fine-tuning","LoRA Training","RAG Systems","Git","Jupyter","VS Code","Visual Studio","PyCharm","Docker","Jenkins","AWS"],"services":["Web application development","Data science and analytics","LLM/RAG and Fine-Tuning models","Backend API optimization"],"projects":[{"name":"MrTouride","description":"Hackathon-winning VR tourism experience built with Unity and IoT integrations.","impact":"Reduced latency by about 30ms and improved immersion with touch-sense features.","link":"https://github.com/thegeekygamechanger/MrTouride.git"},{"name":"ApnaGPT","description":"GPT chatbot with RAG pipelines using LangChain and Streamlit.","impact":"Achieved BLEU 35 and ROUGE 0.5 with optimized LLaMA3 and Mistral flows.","link":"https://github.com/thegeekygamechanger/ApnaGPT.git"},{"name":"KitaabPadhoIndia","description":"Web portal for buying, selling, and renting study materials with LLM support.","impact":"Improved performance and scalability by 23%.","link":"https://github.com/thegeekygamechanger/kitaabpadho.git"},{"name":"Customer Churn Prediction","description":"ML app predicting churn with CatBoost and neural networks in Streamlit.","impact":"Reached 85% accuracy and improved results by 10% with tuning.","link":"https://github.com/thegeekygamechanger/Customer-churn-application.git"}],"experience":[{"role":"Associate Software Engineer","company":"Fusionstak LLC","period":"Nov 2024 - Mar 2025","summary":"Built backend APIs with .NET Core and EF Core plus Angular modules; delivered formly-based configuration editor improving form creation by 45%, optimized SQL retrieval, and reduced third-party API load times."},{"role":"Software Engineer Intern","company":"Centre for Development of Advanced Computing (CDAC)","period":"Jan 2024 - Jul 2024","summary":"Designed data pipelines for LLM projects, implemented preprocessing, enhanced retrieval with LangChain, and built scalable APIs for HPC environments."},{"role":"Software Development Intern","company":"Ministry of Housing and Urban Affairs, Govt. of India","period":"Apr 2023 - Jun 2023","summary":"Developed a digital services platform for local shopkeepers, used analytics to improve UX, and was selected among top 5 projects for senior officer presentation."},{"role":"Research and Development Engineer","company":"Eastern Royal Company","period":"Jul 2022 - May 2023","summary":"Implemented AWS storage solutions, analyzed datasets for insights, and strengthened hosting and analytics workflows."}],"education":[{"program":"Bachelor of Technology in Information Technology","school":"MIT-ADT University, Pune","period":"Aug 2021 - Jul 2024"},{"program":"Diploma in Information Technology","school":"MIT WPU School of Polytechnic, Pune","period":"Aug 2018 - Aug 2021"},{"program":"Matriculation 10th","school":"St. Judes Vidyalaya, Bihar","period":"Mar 2017 - Apr 2018"}],"socialLinks":[{"label":"LinkedIn","url":"https://www.linkedin.com/in/harshkumarhk/"},{"label":"GitHub","url":"https://github.com/thegeekygamechanger"},{"label":"HackerRank","url":"https://www.hackerrank.com/profile/harshkumargoluk1"},{"label":"LeetCode","url":"https://leetcode.com/u/harshkumargoluku2001/"}]};
       window.__PROFILE_SOURCE__ = "static";
     </script>
     <script src="/app.js" defer></script>
