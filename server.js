@@ -84,6 +84,70 @@ app.get("/api/contacts", (req, res) => {
   }
 });
 
+// Download contacts as JSON file
+app.get("/download-contacts", (req, res) => {
+  try {
+    if (fs.existsSync(CONTACTS_FILE)) {
+      res.download(CONTACTS_FILE, "contacts.json");
+    } else {
+      res.status(404).json({ error: "Contacts file not found" });
+    }
+  } catch (error) {
+    console.error("Error downloading contacts:", error);
+    res.status(500).json({ error: "Failed to download contacts" });
+  }
+});
+
+// Simple admin page to view contacts
+app.get("/admin/contacts", (req, res) => {
+  try {
+    if (fs.existsSync(CONTACTS_FILE)) {
+      const data = fs.readFileSync(CONTACTS_FILE, "utf8");
+      const contacts = JSON.parse(data || "[]");
+      
+      const html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Contact Submissions</title>
+          <style>
+            body { font-family: Manrope, sans-serif; padding: 2rem; background: #f7f3ef; }
+            h1 { color: #ff6b3d; }
+            table { border-collapse: collapse; width: 100%; background: white; border-radius: 12px; overflow: hidden; }
+            th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #ddd; }
+            th { background: #ff6b3d; color: white; font-weight: 600; }
+            tr:hover { background: #fafafa; }
+          </style>
+        </head>
+        <body>
+          <h1>📧 Contact Form Submissions</h1>
+          <p>Total: ${contacts.length}</p>
+          <table>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Message</th>
+              <th>Date</th>
+            </tr>
+            ${contacts.map(c => `
+              <tr>
+                <td>${c.name}</td>
+                <td>${c.email}</td>
+                <td>${c.message.substring(0, 50)}...</td>
+                <td>${new Date(c.timestamp).toLocaleString()}</td>
+              </tr>
+            `).join('')}
+          </table>
+        </body>
+        </html>
+      `;
+      res.send(html);
+    }
+  } catch (error) {
+    res.status(500).send("Error loading contacts");
+  }
+});
+
 // Initialize
 initContactsFile();
 
