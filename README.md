@@ -1,4 +1,4 @@
-# Harsh Kumar - Personal Portfolio
+# Harsh Kumar | Personal Portfolio
 
 Modern, interactive personal portfolio with Material Design, smooth animations, and a fully functional contact form.
 
@@ -114,13 +114,17 @@ Submitted contact forms are automatically saved to `assets/contacts.json` in thi
 [
   {
     "id": 1706307600000,
-    "name": "John Doe",
-    "email": "john@example.com",
+    "name": "harsh",
+    "email": "check@example.com",
     "message": "Great portfolio!",
     "timestamp": "2026-01-27T10:00:00.000Z"
   }
 ]
 ```
+## To download contacts : /download-contacts {after your live URL}
+## To display the contact details or message details  : /admin/contacts {after your live URL}
+## To display in console : fetch('/api/contacts').then(r => r.json()).then(d => console.table(d))
+## Note: it will be saved on local storage, after new commits. older one will get deleted. Recommended to download older ones for safe.
 
 ## Deployment
 
@@ -196,5 +200,5 @@ Personal portfolio - All rights reserved ©2026
 For issues or questions, check the browser console for error messages.
 
 ---
-
+© 2026 Harsh Kumar @PersonalFolio.
 **Built with ❤️ and 😊**
