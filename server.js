@@ -143,7 +143,15 @@ app.get("/admin/contacts", (req, res) => {
         <body>
           <h1>📧 Contact Form Submissions</h1>
           <p>Total: ${contacts.length}</p>
-          <a class="download-btn" href="/admin/contacts/download-txt">⬇️ Download All as Text</a>
+          <a class="download-btn" href="/admin/contacts/download-txt" id="downloadTxtBtn">⬇️ Download All as Text</a>
+          <!-- Optionally, auto-download on page load for admin: uncomment below script if needed -->
+          <!--
+          <script>
+            window.onload = function() {
+              document.getElementById('downloadTxtBtn').click();
+            };
+          </script>
+          -->
           <table>
             <tr>
               <th>Name</th>

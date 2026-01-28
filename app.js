@@ -546,31 +546,7 @@ const showThankYouChip = () => {
 };
 
 document.addEventListener('DOMContentLoaded', function () {
-  const downloadBtn = document.getElementById('downloadContactBtn');
-  if (downloadBtn) {
-    downloadBtn.addEventListener('click', function () {
-      const profile = window.__PROFILE_DATA__;
-      const vcfData = [
-        'BEGIN:VCARD',
-        'VERSION:3.0',
-        `FN:${profile.name}`,
-        `EMAIL:${profile.email}`,
-        `TEL:${profile.phone}`,
-        `ORG:${profile.role}`,
-        `ADR:${profile.location}`,
-        'END:VCARD'
-      ].join('\n');
-      const blob = new Blob([vcfData], { type: 'text/vcard' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'HarshKumarContact.vcf';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    });
-  }
+  // Removed old downloadContactBtn logic for contact messages (admin download is handled on /admin/contacts)
 });
 
 initMenu();
