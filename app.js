@@ -545,12 +545,59 @@ const showThankYouChip = () => {
   }, 20000); // 20 seconds
 };
 
+const initDownloadContact = () => {
+  const downloadBtn = byId("downloadContactBtn");
+  if (!downloadBtn) return;
+  
+  downloadBtn.addEventListener("click", () => {
+    try {
+      // Get profile data from the inline data or current page
+      const profile = window.__PROFILE_DATA__ || {};
+      
+      // Create vCard content
+      const vcardContent = `BEGIN:VCARD
+VERSION:3.0
+FN:${profile.name || 'Harsh Kumar'}
+N:${profile.name?.split(' ').reverse().join(';') || 'Kumar;Harsh;;'}
+EMAIL:${profile.email || 'harshkumargoluku2001@gmail.com'}
+TEL:${profile.phone || '+91-7547000491'}
+ADR:;;${profile.location || 'Pune, India'};;;;
+ORG:${profile.role || 'Software Engineer x Gen AI'}
+TITLE:${profile.role || 'Software Engineer x Gen AI'}
+URL:${profile.website || 'https://harshkumar-personalfolio.netlify.app/'}
+NOTE:${profile.tagline || 'Entry-level Software Dev with a Data-driven mindset and hands-on ML experience.'}
+END:VCARD`;
+
+      // Create blob and download
+      const blob = new Blob([vcardContent], { type: 'text/vcard;charset=utf-8' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${profile.name?.replace(/\s+/g, '_') || 'Harsh_Kumar'}.vcf`;
+      document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(link);
+      }, 100);
+      
+      console.log('✅ vCard downloaded successfully');
+    } catch (error) {
+      console.error('Error downloading vCard:', error);
+      alert('Unable to download contact card. Please try again.');
+    }
+  });
+};
+
 document.addEventListener('DOMContentLoaded', function () {
-  // Removed old downloadContactBtn logic for contact messages (admin download is handled on /admin/contacts)
+  initDownloadContact();
 });
 
 initMenu();
 initDownloadResume();
+initDownloadContact();
 initSmoothScroll();
 initSocialDropdown();
 initContactForm();
