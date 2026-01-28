@@ -1,3 +1,20 @@
+// Download all contacts as plain text
+app.get("/admin/contacts/download-txt", (req, res) => {
+  try {
+    if (fs.existsSync(CONTACTS_FILE)) {
+      const data = fs.readFileSync(CONTACTS_FILE, "utf8");
+      const contacts = JSON.parse(data || "[]");
+      let text = contacts.map((c, i) => `#${i + 1}\nName: ${c.name}\nEmail: ${c.email}\nMessage: ${c.message}\nDate: ${c.timestamp ? new Date(c.timestamp).toLocaleString() : ''}\n---`).join("\n\n");
+      res.setHeader("Content-Disposition", "attachment; filename=contacts.txt");
+      res.setHeader("Content-Type", "text/plain");
+      res.send(text);
+    } else {
+      res.status(404).send("Contacts file not found");
+    }
+  } catch (error) {
+    res.status(500).send("Failed to download contacts as text");
+  }
+});
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
