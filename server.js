@@ -150,13 +150,30 @@ const PROFILE_FILE = path.join(__dirname, "assets", "profile.json");
 // Initialize secure email credentials
 const emailCredentials = new SecureEmailCredentials();
 
-// Email configuration with secure encrypted credentials
+// Email configuration with environment variables (for production)
 let transporter = null;
 
-// Initialize email transporter with secure credentials
+// Initialize email transporter
 const initializeEmailTransporter = () => {
-  const credentials = emailCredentials.getCredentials();
+  // Try environment variables first (for Render.com)
+  const emailUser = process.env.EMAIL_USER;
+  const emailPass = process.env.EMAIL_PASS;
   
+  if (emailUser && emailPass) {
+    transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: emailUser,
+        pass: emailPass
+      }
+    });
+    
+    console.log(`🔐 Email transporter initialized with environment variables for ${emailUser}`);
+    return true;
+  }
+  
+  // Fallback to encrypted credentials (for local development)
+  const credentials = emailCredentials.getCredentials();
   if (credentials) {
     transporter = nodemailer.createTransport({
       service: credentials.service,
@@ -168,10 +185,10 @@ const initializeEmailTransporter = () => {
     
     console.log(`🔐 Email transporter initialized with encrypted credentials for ${credentials.user}`);
     return true;
-  } else {
-    console.log('❌ Failed to initialize email transporter - invalid credentials');
-    return false;
   }
+  
+  console.log('❌ Failed to initialize email transporter - no credentials available');
+  return false;
 };
 
 // Verify email configuration on startup
@@ -198,9 +215,20 @@ const sendContactEmail = async (contactData) => {
       throw new Error('Email transporter not initialized');
     }
 
-    const credentials = emailCredentials.getCredentials();
-    if (!credentials) {
-      throw new Error('Email credentials not available');
+    // Get email from environment variables or credentials
+    const emailUser = process.env.EMAIL_USER;
+    const emailPass = process.env.EMAIL_PASS;
+    
+    let credentials;
+    if (emailUser && emailPass) {
+      // Use environment variables (production)
+      credentials = { user: emailUser, password: emailPass };
+    } else {
+      // Use encrypted credentials (local development)
+      credentials = emailCredentials.getCredentials();
+      if (!credentials) {
+        throw new Error('Email credentials not available');
+      }
     }
 
     const mailOptions = {
