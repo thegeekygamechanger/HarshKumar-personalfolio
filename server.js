@@ -164,6 +164,31 @@ const emailCredentials = new SecureEmailCredentials();
 // Email configuration with encrypted credentials (for all environments)
 let transporter = null;
 
+// Initialize admin credentials if not exists
+const initAdminCredentials = async () => {
+  try {
+    if (!fs.existsSync(ADMIN_CREDENTIALS_FILE)) {
+      console.log('🔧 Creating default admin credentials...');
+      
+      const defaultCredentials = {
+        username: 'admin',
+        passwordHash: await bcrypt.hash('admin123', 12),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        updatedBy: 'system',
+        updatedFrom: 'auto-setup'
+      };
+      
+      fs.writeFileSync(ADMIN_CREDENTIALS_FILE, JSON.stringify(defaultCredentials, null, 2));
+      console.log('✅ Default admin credentials created');
+      console.log('👤 Username: admin');
+      console.log('🔑 Password: admin123');
+    }
+  } catch (error) {
+    console.error('❌ Error initializing admin credentials:', error);
+  }
+};
+
 // Initialize email transporter with encrypted credentials
 const initializeEmailTransporter = () => {
   const credentials = emailCredentials.getCredentials();
@@ -1283,12 +1308,35 @@ app.use((req, res, next) => {
 });
 
 // Start server
-const server = app.listen(PORT, () => {
-  console.log(`🚀 Portfolio server running on http://localhost:${PORT}`);
-  console.log(`📧 Contacts will be saved to: ${CONTACTS_FILE}`);
-  console.log(`🔐 Admin credentials: ${ADMIN_CREDENTIALS_FILE}`);
-  console.log(`🛡️ Security features enabled`);
-});
+const startServer = async () => {
+  try {
+    // Initialize admin credentials
+    await initAdminCredentials();
+    
+    // Initialize email transporter
+    initializeEmailTransporter();
+    
+    // Verify email configuration
+    verifyEmailConfiguration();
+    
+    // Start the server
+    const server = app.listen(PORT, () => {
+      console.log(`🚀 Portfolio server running on http://localhost:${PORT}`);
+      console.log(`📧 Contacts will be saved to: ${CONTACTS_FILE}`);
+      console.log(`🔐 Admin credentials: ${ADMIN_CREDENTIALS_FILE}`);
+      console.log(`🛡️ Security features enabled`);
+      console.log(`📧 Email service: ${transporter ? '✅ Active' : '❌ Inactive'}`);
+    });
+    
+    return server;
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    process.exit(1);
+  }
+};
+
+// Start the server
+startServer();
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
