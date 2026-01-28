@@ -170,11 +170,19 @@ const initializeEmailTransporter = () => {
   
   if (credentials) {
     transporter = nodemailer.createTransport({
-      service: credentials.service,
+      service: 'gmail',
       auth: {
         user: credentials.user,
         pass: credentials.password
-      }
+      },
+      pool: true, // Use connection pooling
+      maxConnections: 1,
+      maxMessages: 5,
+      rateDelta: 1000, // 1000ms between messages
+      rateLimit: 5, // max 5 messages per second
+      connectionTimeout: 60000, // 60 seconds
+      greetingTimeout: 30000, // 30 seconds
+      socketTimeout: 60000 // 60 seconds
     });
     
     console.log(`🔐 Email transporter initialized with encrypted credentials for ${credentials.user}`);
@@ -201,8 +209,10 @@ const verifyEmailConfiguration = () => {
   }
 };
 
-// Email sending function
-const sendContactEmail = async (contactData) => {
+// Email sending function with retry logic
+const sendContactEmail = async (contactData, retryCount = 0) => {
+  const maxRetries = 2;
+  
   try {
     // Check if transporter is available
     if (!transporter) {
@@ -288,7 +298,17 @@ const sendContactEmail = async (contactData) => {
     console.log('✅ Email sent successfully:', info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error('❌ Error sending email:', error);
+    console.error(`❌ Email sending error (attempt ${retryCount + 1}):`, error.message);
+    
+    // Retry logic
+    if (retryCount < maxRetries) {
+      console.log(`🔄 Retrying email send in 2 seconds...`);
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      return sendContactEmail(contactData, retryCount + 1);
+    }
+    
+    // Final failure
+    console.error('❌ All email retries failed');
     return { success: false, error: error.message };
   }
 };
