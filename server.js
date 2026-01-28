@@ -1,5 +1,3 @@
-// ...existing code...
-
 // Download all contacts as plain text
 app.get("/admin/contacts/download-txt", (req, res) => {
   try {
@@ -17,6 +15,7 @@ app.get("/admin/contacts/download-txt", (req, res) => {
     res.status(500).send("Failed to download contacts as text");
   }
 });
+// ...existing code...
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
