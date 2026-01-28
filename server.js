@@ -17,6 +17,9 @@ const SecureEmailCredentials = require("./secure-email-credentials");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Trust proxy for Render.com and other reverse proxies
+app.set('trust proxy', true);
+
 // Performance middleware
 app.use(compression({
   filter: (req, res) => {
@@ -50,6 +53,10 @@ const limiter = rateLimit({
   message: { error: "Too many requests from this IP, please try again later." },
   standardHeaders: true,
   legacyHeaders: false,
+  trustProxy: true, // Important for Render.com
+  keyGenerator: (req) => {
+    return req.ip || req.connection.remoteAddress;
+  }
 });
 
 const authLimiter = rateLimit({
@@ -58,6 +65,10 @@ const authLimiter = rateLimit({
   message: { error: "Too many login attempts, please try again later." },
   standardHeaders: true,
   legacyHeaders: false,
+  trustProxy: true, // Important for Render.com
+  keyGenerator: (req) => {
+    return req.ip || req.connection.remoteAddress;
+  }
 });
 
 // CORS configuration
