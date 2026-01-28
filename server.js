@@ -104,7 +104,14 @@ app.get("/admin/contacts", (req, res) => {
     if (fs.existsSync(CONTACTS_FILE)) {
       const data = fs.readFileSync(CONTACTS_FILE, "utf8");
       const contacts = JSON.parse(data || "[]");
-      
+      let rows = contacts.map(c => `
+        <tr>
+          <td>${c.name}</td>
+          <td>${c.email}</td>
+          <td>${c.message ? c.message.substring(0, 50) : ''}...</td>
+          <td>${c.timestamp ? new Date(c.timestamp).toLocaleString() : ''}</td>
+        </tr>
+      `).join('');
       const html = `
         <!DOCTYPE html>
         <html>
@@ -129,14 +136,7 @@ app.get("/admin/contacts", (req, res) => {
               <th>Message</th>
               <th>Date</th>
             </tr>
-            ${contacts.map(c => `
-              <tr>
-                <td>${c.name}</td>
-                <td>${c.email}</td>
-                <td>${c.message.substring(0, 50)}...</td>
-                <td>${new Date(c.timestamp).toLocaleString()}</td>
-              </tr>
-            `).join('')}
+            ${rows}
           </table>
         </body>
         </html>
