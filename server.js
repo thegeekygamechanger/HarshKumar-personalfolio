@@ -167,6 +167,13 @@ let transporter = null;
 // Initialize admin credentials if not exists
 const initAdminCredentials = async () => {
   try {
+    // Ensure assets directory exists
+    const assetsDir = path.dirname(ADMIN_CREDENTIALS_FILE);
+    if (!fs.existsSync(assetsDir)) {
+      console.log('📁 Creating assets directory...');
+      fs.mkdirSync(assetsDir, { recursive: true });
+    }
+    
     if (!fs.existsSync(ADMIN_CREDENTIALS_FILE)) {
       console.log('🔧 Creating default admin credentials...');
       
@@ -183,6 +190,9 @@ const initAdminCredentials = async () => {
       console.log('✅ Default admin credentials created');
       console.log('👤 Username: admin');
       console.log('🔑 Password: admin123');
+      console.log(`📁 File location: ${ADMIN_CREDENTIALS_FILE}`);
+    } else {
+      console.log('✅ Admin credentials file already exists');
     }
   } catch (error) {
     console.error('❌ Error initializing admin credentials:', error);
@@ -570,12 +580,25 @@ app.post("/api/change-password", requireAuth, authLimiter, [
 
     const { currentPassword, newPassword } = req.body;
     
+    // Check if admin credentials file exists
+    if (!fs.existsSync(ADMIN_CREDENTIALS_FILE)) {
+      console.error('❌ Admin credentials file not found during password change');
+      return res.status(500).json({ error: "Admin credentials not available" });
+    }
+    
     // Get session ID from request
     const sessionId = req.headers.authorization || 
                       req.headers['x-session-id'] ||
                       req.cookies?.adminSession;
     
-    const credentials = JSON.parse(fs.readFileSync(ADMIN_CREDENTIALS_FILE, "utf8"));
+    let credentials;
+    try {
+      const credentialsData = fs.readFileSync(ADMIN_CREDENTIALS_FILE, "utf8");
+      credentials = JSON.parse(credentialsData);
+    } catch (error) {
+      console.error('❌ Error reading admin credentials:', error);
+      return res.status(500).json({ error: "Failed to read credentials" });
+    }
     
     const isCurrentPasswordValid = await bcrypt.compare(currentPassword, credentials.passwordHash);
     
@@ -607,9 +630,15 @@ app.post("/api/change-password", requireAuth, authLimiter, [
     }
     credentials.updatedFrom = req.ip;
     
-    fs.writeFileSync(ADMIN_CREDENTIALS_FILE, JSON.stringify(credentials, null, 2));
-    
-    console.log(`🔑 Password changed for user: ${username} from ${req.ip}`);
+    // Write updated credentials with error handling
+    try {
+      fs.writeFileSync(ADMIN_CREDENTIALS_FILE, JSON.stringify(credentials, null, 2));
+      console.log(`🔑 Password changed for user: ${username} from ${req.ip}`);
+      console.log(`📁 Credentials file updated: ${ADMIN_CREDENTIALS_FILE}`);
+    } catch (error) {
+      console.error('❌ Error writing updated credentials:', error);
+      return res.status(500).json({ error: "Failed to save new password" });
+    }
     
     res.json({
       success: true,
