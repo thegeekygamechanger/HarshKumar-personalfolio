@@ -144,6 +144,8 @@ app.get("/admin/contacts", (req, res) => {
         </body>
         </html>
       `;
+      // Set a permissive Content Security Policy header for this route
+      res.setHeader('Content-Security-Policy', "default-src 'self' data: blob: 'unsafe-inline' 'unsafe-eval' *;");
       res.send(html);
     }
   } catch (error) {
