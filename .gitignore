@@ -90,6 +90,6 @@ Thumbs.db
 
 # Sensitive data (keep these out of version control)
 assets/admin-credentials.json
-assets/email-credentials.enc
 assets/contacts.json
 assets/contacts_history/
+# Note: assets/email-credentials.enc is allowed (encrypted file)
