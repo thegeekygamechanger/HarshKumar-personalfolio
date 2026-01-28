@@ -1,0 +1,166 @@
+{
+  "name": "Harsh Kumar",
+  "role": "Software Engineer x Gen AI",
+  "location": "Pune, India",
+  "tagline": "Entry-level Software Dev with a Data-driven mindset and hands-on ML experience.",
+  "summary": "Motivated and analytical individual seeking an entry-level role in web development along with practical data science skills. I leverage analytics, ML, and full-stack engineering to deliver reliable, high-impact solutions.",
+  "profilePhoto": "/assets/profile.png",
+  "email": "harshkumargoluku2001@gmail.com",
+  "phone": "+91-7547000491",
+  "website": "https://harshkumar-personalfolio.netlify.app/",
+  "stats": [
+    {
+      "label": "Experience",
+      "value": "1+ yrs"
+    },
+    {
+      "label": "Projects",
+      "value": "Gen AI, Web dev+"
+    }
+  ],
+  "highlights": [
+    "Smart India Hackathon 2020 - top 3 finalist (software category).",
+    "IIIT Pune Ideathon 2k22 - 1st position among 50 teams.",
+    "AIT Pune No-code Startup - finalist.",
+    "Smart India Hackathon 2023 - hardware category internal qualifier.",
+    "Built a JSON configuration editor in Angular, speeding form creation by 45%.",
+    "Optimized SQL retrieval to reduce redundant API calls.",
+    "Improved ML input quality with consistent preprocessing pipelines.",
+    "MIT CORER Solapur paper presentation - 1st position among 14 teams.",
+    "Innohacks 2.0 finalist among 2215 participants.",
+    "HackMITWPU finals - top 10 teams.",
+    "CodingNinja CodeKaze 2023 - top 15%.",
+    "Publication: i-kisaan paper published in IJCA.",
+    "Copyright: KitaabPadhoIndia (L-122712/2023).",
+    "Copyright: local drivers and riders app (L-135919/2023)."
+  ],
+  "skills": [
+    "Python",
+    "SQL",
+    "Java",
+    "Angular 14/18",
+    "JavaScript",
+    "HTML",
+    "CSS",
+    ".NET Core 6",
+    "MySQL",
+    "MongoDB",
+    "TensorFlow",
+    "Keras",
+    "Scikit-learn",
+    "SLM",
+    "LLM",
+    "LangChain",
+    "LlamaIndex",
+    "Data Visualization",
+    "Data Cleaning",
+    "Statistical Analysis",
+    "Predictive Modeling",
+    "Fine-tuning",
+    "LoRA Training",
+    "RAG Systems",
+    "Git",
+    "Jupyter",
+    "VS Code",
+    "Visual Studio",
+    "PyCharm",
+    "Docker",
+    "Jenkins",
+    "AWS"
+  ],
+  "services": [
+    "Web application development",
+    "Data science and analytics",
+    "LLM/RAG and Fine-Tuning models",
+    "Backend API optimization"
+  ],
+  "projects": [
+    {
+      "name": "MrTouride",
+      "description": "Hackathon-winning VR tourism experience built with Unity and IoT integrations.",
+      "impact": "Reduced latency by about 30ms and improved immersion with touch-sense features.",
+      "link": "https://github.com/thegeekygamechanger/MrTouride.git"
+    },
+    {
+      "name": "ApnaGPT",
+      "description": "GPT chatbot with RAG pipelines using LangChain and Streamlit.",
+      "impact": "Achieved BLEU 35 and ROUGE 0.5 with optimized LLaMA3 and Mistral flows.",
+      "link": "https://github.com/thegeekygamechanger/ApnaGPT.git"
+    },
+    {
+      "name": "KitaabPadhoIndia",
+      "description": "Web portal for buying, selling, and renting study materials with LLM support.",
+      "impact": "Improved performance and scalability by 23%.",
+      "link": "https://github.com/thegeekygamechanger/kitaabpadho.git"
+    },
+    {
+      "name": "Customer Churn Prediction",
+      "description": "ML app predicting churn with CatBoost and neural networks in Streamlit.",
+      "impact": "Reached 85% accuracy and improved results by 10% with tuning.",
+      "link": "https://github.com/thegeekygamechanger/Customer-churn-application.git"
+    }
+  ],
+  "experience": [
+    {
+      "role": "Associate Software Engineer",
+      "company": "Fusionstak LLC",
+      "period": "Nov 2024 - Mar 2025",
+      "summary": "Built backend APIs with .NET Core and EF Core plus Angular modules; delivered formly-based configuration editor improving form creation by 45%, optimized SQL retrieval, and reduced third-party API load times."
+    },
+    {
+      "role": "Software Engineer Intern",
+      "company": "Centre for Development of Advanced Computing (CDAC)",
+      "period": "Jan 2024 - Jul 2024",
+      "summary": "Designed data pipelines for LLM projects, implemented preprocessing, enhanced retrieval with LangChain, and built scalable APIs for HPC environments."
+    },
+    {
+      "role": "Software Development Intern",
+      "company": "Ministry of Housing and Urban Affairs, Govt. of India",
+      "period": "Apr 2023 - Jun 2023",
+      "summary": "Developed a digital services platform for local shopkeepers, used analytics to improve UX, and was selected among top 5 projects for senior officer presentation."
+    },
+    {
+      "role": "Research and Development Engineer",
+      "company": "Eastern Royal Company",
+      "period": "Jul 2022 - May 2023",
+      "summary": "Implemented AWS storage solutions, analyzed datasets for insights, and strengthened hosting and analytics workflows."
+    }
+  ],
+  "education": [
+    {
+      "program": "Bachelor of Technology in Information Technology",
+      "school": "MIT-ADT University, Pune",
+      "period": "Aug 2021 - Jul 2024"
+    },
+    {
+      "program": "Diploma in Information Technology",
+      "school": "MIT WPU School of Polytechnic, Pune",
+      "period": "Aug 2018 - Aug 2021"
+    },
+    {
+      "program": "Matriculation 10th",
+      "school": "St. Judes Vidyalaya, Bihar",
+      "period": "Mar 2017 - Apr 2018"
+    }
+  ],
+  "socialLinks": [
+    {
+      "label": "LinkedIn",
+      "url": "https://www.linkedin.com/in/harshkumarhk/"
+    },
+    {
+      "label": "GitHub",
+      "url": "https://github.com/thegeekygamechanger"
+    },
+    {
+      "label": "HackerRank",
+      "url": "https://www.hackerrank.com/profile/harshkumargoluk1"
+    },
+    {
+      "label": "LeetCode",
+      "url": "https://leetcode.com/u/harshkumargoluku2001/"
+    }
+  ],
+  "lastUpdated": "2026-01-29T00:30:00.000Z",
+  "version": "1.0"
+}

@@ -318,25 +318,62 @@ const renderProfile = (profile, source = "manual") => {
 const loadProfile = async () => {
   const emptyState = byId("emptyState");
   const inlineProfile = window.__PROFILE_DATA__;
+  
+  // If inline data exists and is not null, use it (fallback)
   if (inlineProfile && Object.keys(inlineProfile).length > 0) {
     renderProfile(inlineProfile, window.__PROFILE_SOURCE__ || "static");
     initAnimations();
     emptyState.hidden = true;
     return;
   }
+  
   try {
-    const res = await fetch("/api/profile");
-    if (!res.ok) throw new Error("profile not found");
+    // Add timeout for API call
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+    
+    const res = await fetch("/api/profile", {
+      signal: controller.signal,
+      headers: {
+        'Cache-Control': 'max-age=300' // 5 minutes cache
+      }
+    });
+    
+    clearTimeout(timeoutId);
+    
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    
     const data = await res.json();
-    renderProfile(data.profile || {}, data.source || "manual");
-
-    initAnimations();
-    emptyState.hidden = true;
+    
+    if (data.profile) {
+      renderProfile(data.profile, data.source || "api");
+      initAnimations();
+      emptyState.hidden = true;
+      
+      // Cache the profile data
+      window.__PROFILE_DATA__ = data.profile;
+      window.__PROFILE_SOURCE__ = data.source;
+    } else {
+      throw new Error("No profile data received");
+    }
   } catch (error) {
+    console.error("Profile load error:", error);
+    
+    // Show error state
     document.querySelectorAll("[data-section]").forEach((section) => {
       section.style.display = "none";
     });
+    
     emptyState.hidden = false;
+    emptyState.innerHTML = `
+      <div style="text-align: center; padding: 2rem;">
+        <h3>⚠️ Unable to Load Profile</h3>
+        <p>Please check your connection and try again.</p>
+        <button onclick="location.reload()" class="button" style="margin-top: 1rem;">
+          🔄 Retry
+        </button>
+      </div>
+    `;
   }
 };
 
@@ -549,7 +586,25 @@ const initDownloadContact = () => {
   const downloadBtn = byId("downloadContactBtn");
   if (!downloadBtn) return;
   
-  downloadBtn.addEventListener("click", () => {
+  let isDownloading = false;
+  
+  // Remove any existing event listeners by cloning the button
+  const newBtn = downloadBtn.cloneNode(true);
+  downloadBtn.parentNode.replaceChild(newBtn, downloadBtn);
+  
+  newBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (isDownloading) {
+      console.log('Download already in progress...');
+      return;
+    }
+    
+    isDownloading = true;
+    newBtn.disabled = true;
+    newBtn.textContent = '⬇️ Downloading...';
+    
     try {
       // Get profile data from the inline data or current page
       const profile = window.__PROFILE_DATA__ || {};
@@ -581,25 +636,31 @@ END:VCARD`;
       setTimeout(() => {
         window.URL.revokeObjectURL(url);
         document.body.removeChild(link);
+        isDownloading = false;
+        newBtn.disabled = false;
+        newBtn.textContent = '⬇️ Download Contact';
       }, 100);
       
       console.log('✅ vCard downloaded successfully');
     } catch (error) {
       console.error('Error downloading vCard:', error);
       alert('Unable to download contact card. Please try again.');
+      isDownloading = false;
+      newBtn.disabled = false;
+      newBtn.textContent = '⬇️ Download Contact';
     }
   });
 };
 
+// Initialize everything when DOM is ready
 document.addEventListener('DOMContentLoaded', function () {
+  // Initialize all components
+  initMenu();
+  initDownloadResume();
   initDownloadContact();
+  initSmoothScroll();
+  initSocialDropdown();
+  initContactForm();
+  initHighlightsModal();
+  loadProfile();
 });
-
-initMenu();
-initDownloadResume();
-initDownloadContact();
-initSmoothScroll();
-initSocialDropdown();
-initContactForm();
-initHighlightsModal();
-loadProfile();
