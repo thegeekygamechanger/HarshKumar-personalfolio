@@ -91,6 +91,7 @@ app.get("/download-contacts", (req, res) => {
       res.download(CONTACTS_FILE, "contacts.json");
     } else {
       res.status(404).json({ error: "Contacts file not found" });
+      const CONTACTS_HISTORY_DIR = path.join(__dirname, "assets", "contacts_history");
     }
   } catch (error) {
     console.error("Error downloading contacts:", error);
@@ -101,6 +102,9 @@ app.get("/download-contacts", (req, res) => {
 // Simple admin page to view contacts
 app.get("/admin/contacts", (req, res) => {
   try {
+        if (!fs.existsSync(CONTACTS_HISTORY_DIR)) {
+          fs.mkdirSync(CONTACTS_HISTORY_DIR, { recursive: true });
+        }
     if (fs.existsSync(CONTACTS_FILE)) {
       const data = fs.readFileSync(CONTACTS_FILE, "utf8");
       const contacts = JSON.parse(data || "[]");
@@ -117,11 +121,14 @@ app.get("/admin/contacts", (req, res) => {
             th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #ddd; }
             th { background: #ff6b3d; color: white; font-weight: 600; }
             tr:hover { background: #fafafa; }
+            .download-btn { display: inline-block; margin: 1rem 0; padding: 0.7rem 1.5rem; background: #ff6b3d; color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; text-decoration: none; transition: background 0.2s; }
+            .download-btn:hover { background: #ff8c5a; }
           </style>
         </head>
         <body>
           <h1>📧 Contact Form Submissions</h1>
           <p>Total: ${contacts.length}</p>
+          <a class="download-btn" href="/admin/contacts/download-txt">⬇️ Download All as Text</a>
           <table>
             <tr>
               <th>Name</th>
@@ -130,6 +137,14 @@ app.get("/admin/contacts", (req, res) => {
               <th>Date</th>
             </tr>
             ${contacts.map(c => `
+          // Save a backup in history folder
+          try {
+            const backupName = `contacts_${Date.now()}.json`;
+            const backupPath = path.join(CONTACTS_HISTORY_DIR, backupName);
+            fs.writeFileSync(backupPath, JSON.stringify(contacts, null, 2));
+          } catch (e) {
+            console.error("Failed to save contacts backup:", e);
+          }
               <tr>
                 <td>${c.name}</td>
                 <td>${c.email}</td>
@@ -141,6 +156,23 @@ app.get("/admin/contacts", (req, res) => {
         </body>
         </html>
       `;
+      // Download all contacts as plain text
+      app.get("/admin/contacts/download-txt", (req, res) => {
+        try {
+          if (fs.existsSync(CONTACTS_FILE)) {
+            const data = fs.readFileSync(CONTACTS_FILE, "utf8");
+            const contacts = JSON.parse(data || "[]");
+            let text = contacts.map((c, i) => `#${i + 1}\nName: ${c.name}\nEmail: ${c.email}\nMessage: ${c.message}\nDate: ${new Date(c.timestamp).toLocaleString()}\n---`).join("\n\n");
+            res.setHeader("Content-Disposition", "attachment; filename=contacts.txt");
+            res.setHeader("Content-Type", "text/plain");
+            res.send(text);
+          } else {
+            res.status(404).send("Contacts file not found");
+          }
+        } catch (error) {
+          res.status(500).send("Failed to download contacts as text");
+        }
+      });
       res.send(html);
     }
   } catch (error) {
