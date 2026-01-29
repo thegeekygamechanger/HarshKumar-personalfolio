@@ -404,7 +404,7 @@ const initDownloadResume = () => {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = "Harsh_Kumar_Resume.pdf";
+      link.download = "Amrita_Ranjan_Resume.pdf";
       document.body.appendChild(link);
       link.click();
       
