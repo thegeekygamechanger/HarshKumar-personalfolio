@@ -68,7 +68,6 @@ In Render service settings → Environment:
 ```
 NODE_ENV=production
 PORT=3000
-TRUST_PROXY_HOPS=1
 ```
 
 #### **4. Deploy!**
