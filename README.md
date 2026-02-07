@@ -10,6 +10,7 @@ Set these in your Render service settings:
 ```bash
 NODE_ENV=production
 PORT=3000
+TRUST_PROXY_HOPS=1
 ```
 
 #### **2. Build Command**

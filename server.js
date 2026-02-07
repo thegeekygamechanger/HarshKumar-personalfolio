@@ -16,7 +16,8 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Trust proxy for Render.com and other reverse proxies
-app.set('trust proxy', true);
+const trustProxyHops = Number.parseInt(process.env.TRUST_PROXY_HOPS || '1', 10);
+app.set('trust proxy', Number.isNaN(trustProxyHops) ? 1 : trustProxyHops);
 
 // Performance middleware
 app.use(compression({
