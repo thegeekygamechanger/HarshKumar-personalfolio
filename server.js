@@ -11,8 +11,6 @@ const { body, validationResult } = require("express-validator");
 const mongoSanitize = require("mongo-sanitize");
 const xss = require("xss");
 const compression = require("compression");
-const nodemailer = require("nodemailer");
-const SecureEmailCredentials = require("./secure-email-credentials");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -53,10 +51,6 @@ const limiter = rateLimit({
   message: { error: "Too many requests from this IP, please try again later." },
   standardHeaders: true,
   legacyHeaders: false,
-  trustProxy: true, // Important for Render.com
-  keyGenerator: (req) => {
-    return req.ip || req.connection.remoteAddress;
-  }
 });
 
 const authLimiter = rateLimit({
@@ -65,10 +59,6 @@ const authLimiter = rateLimit({
   message: { error: "Too many login attempts, please try again later." },
   standardHeaders: true,
   legacyHeaders: false,
-  trustProxy: true, // Important for Render.com
-  keyGenerator: (req) => {
-    return req.ip || req.connection.remoteAddress;
-  }
 });
 
 // CORS configuration
@@ -158,25 +148,14 @@ const CONTACTS_FILE = path.join(__dirname, "assets", "contacts.json");
 const ADMIN_CREDENTIALS_FILE = path.join(__dirname, "assets", "admin-credentials.json");
 const PROFILE_FILE = path.join(__dirname, "assets", "profile.json");
 
-// Initialize secure email credentials
-const emailCredentials = new SecureEmailCredentials();
-
-// Email configuration with encrypted credentials (for all environments)
-let transporter = null;
-
-// Initialize admin credentials if not exists
 const initAdminCredentials = async () => {
   try {
-    // Ensure assets directory exists
     const assetsDir = path.dirname(ADMIN_CREDENTIALS_FILE);
     if (!fs.existsSync(assetsDir)) {
-      console.log('📁 Creating assets directory...');
       fs.mkdirSync(assetsDir, { recursive: true });
     }
-    
+
     if (!fs.existsSync(ADMIN_CREDENTIALS_FILE)) {
-      console.log('🔧 Creating default admin credentials...');
-      
       const defaultCredentials = {
         username: 'admin',
         passwordHash: await bcrypt.hash('admin123', 12),
@@ -185,166 +164,10 @@ const initAdminCredentials = async () => {
         updatedBy: 'system',
         updatedFrom: 'auto-setup'
       };
-      
       fs.writeFileSync(ADMIN_CREDENTIALS_FILE, JSON.stringify(defaultCredentials, null, 2));
-      console.log('✅ Default admin credentials created');
-      console.log('👤 Username: admin');
-      console.log('🔑 Password: admin123');
-      console.log(`📁 File location: ${ADMIN_CREDENTIALS_FILE}`);
-    } else {
-      console.log('✅ Admin credentials file already exists');
     }
   } catch (error) {
     console.error('❌ Error initializing admin credentials:', error);
-  }
-};
-
-// Initialize email transporter with encrypted credentials
-const initializeEmailTransporter = () => {
-  const credentials = emailCredentials.getCredentials();
-  
-  if (credentials) {
-    transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: credentials.user,
-        pass: credentials.password
-      },
-      pool: true, // Use connection pooling
-      maxConnections: 1,
-      maxMessages: 5,
-      rateDelta: 1000, // 1000ms between messages
-      rateLimit: 5, // max 5 messages per second
-      connectionTimeout: 60000, // 60 seconds
-      greetingTimeout: 30000, // 30 seconds
-      socketTimeout: 60000 // 60 seconds
-    });
-    
-    console.log(`🔐 Email transporter initialized with encrypted credentials for ${credentials.user}`);
-    return true;
-  } else {
-    console.log('❌ Failed to initialize email transporter - invalid credentials');
-    return false;
-  }
-};
-
-// Verify email configuration on startup
-const verifyEmailConfiguration = () => {
-  if (transporter) {
-    transporter.verify((error, success) => {
-      if (error) {
-        console.error('❌ Email configuration error:', error.message);
-        console.log('📧 Email service will be disabled');
-      } else {
-        console.log('✅ Email server is ready to send messages');
-      }
-    });
-  } else {
-    console.log('📧 Email service not available - no valid credentials');
-  }
-};
-
-// Email sending function with retry logic
-const sendContactEmail = async (contactData, retryCount = 0) => {
-  const maxRetries = 2;
-  
-  try {
-    // Check if transporter is available
-    if (!transporter) {
-      throw new Error('Email transporter not initialized');
-    }
-
-    const credentials = emailCredentials.getCredentials();
-    if (!credentials) {
-      throw new Error('Email credentials not available');
-    }
-
-    const mailOptions = {
-      from: `"Portfolio Contact Form" <${credentials.user}>`,
-      to: credentials.user, // Send to the same email account
-      subject: `📧 New Contact Message from ${contactData.name}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f9fa;">
-          <div style="background-color: #ff6b3d; color: white; padding: 20px; border-radius: 10px 10px 0 0; text-align: center;">
-            <h1 style="margin: 0; font-size: 24px;">📧 New Contact Message</h1>
-            <p style="margin: 10px 0 0 0; opacity: 0.9;">Portfolio Contact Form Submission</p>
-          </div>
-          
-          <div style="background-color: white; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-            <div style="margin-bottom: 20px;">
-              <h3 style="color: #333; margin-bottom: 5px;">👤 Contact Information</h3>
-              <table style="width: 100%; border-collapse: collapse;">
-                <tr>
-                  <td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold; width: 120px;">Name:</td>
-                  <td style="padding: 10px; border-bottom: 1px solid #eee;">${contactData.name}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">Email:</td>
-                  <td style="padding: 10px; border-bottom: 1px solid #eee;">
-                    <a href="mailto:${contactData.email}" style="color: #ff6b3d; text-decoration: none;">${contactData.email}</a>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">Date:</td>
-                  <td style="padding: 10px; border-bottom: 1px solid #eee;">${new Date(contactData.timestamp).toLocaleString()}</td>
-                </tr>
-                ${contactData.ip ? `
-                <tr>
-                  <td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">IP Address:</td>
-                  <td style="padding: 10px; border-bottom: 1px solid #eee;">${contactData.ip}</td>
-                </tr>
-                ` : ''}
-              </table>
-            </div>
-            
-            <div style="margin-bottom: 20px;">
-              <h3 style="color: #333; margin-bottom: 10px;">💬 Message</h3>
-              <div style="background-color: #f8f9fa; padding: 15px; border-left: 4px solid #ff6b3d; border-radius: 5px;">
-                <p style="margin: 0; line-height: 1.6; color: #333;">${contactData.message}</p>
-              </div>
-            </div>
-            
-            <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
-              <p style="margin: 0; color: #666; font-size: 14px;">
-                This message was sent from your portfolio website<br>
-                <a href="http://localhost:3000" style="color: #ff6b3d; text-decoration: none;">View Portfolio</a>
-              </p>
-            </div>
-          </div>
-        </div>
-      `,
-      text: `
-        New Contact Message from Portfolio Website
-        
-        Name: ${contactData.name}
-        Email: ${contactData.email}
-        Date: ${new Date(contactData.timestamp).toLocaleString()}
-        ${contactData.ip ? `IP Address: ${contactData.ip}` : ''}
-        
-        Message:
-        ${contactData.message}
-        
-        ---
-        This message was sent from your portfolio website
-      `
-    };
-
-    const info = await transporter.sendMail(mailOptions);
-    console.log('✅ Email sent successfully:', info.messageId);
-    return { success: true, messageId: info.messageId };
-  } catch (error) {
-    console.error(`❌ Email sending error (attempt ${retryCount + 1}):`, error.message);
-    
-    // Retry logic
-    if (retryCount < maxRetries) {
-      console.log(`🔄 Retrying email send in 2 seconds...`);
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      return sendContactEmail(contactData, retryCount + 1);
-    }
-    
-    // Final failure
-    console.error('❌ All email retries failed');
-    return { success: false, error: error.message };
   }
 };
 
@@ -357,18 +180,13 @@ const requireAuth = (req, res, next) => {
                     req.headers['x-session-id'] ||
                     req.cookies?.adminSession;
   
-  console.log('🔍 requireAuth - Session ID:', sessionId);
-  console.log('🔍 requireAuth - Cookie session:', req.cookies?.adminSession);
-  console.log('🔍 requireAuth - Available sessions:', Array.from(sessions.keys()));
   
   if (!sessionId || !sessions.has(sessionId)) {
-    console.log('❌ requireAuth - Authentication required');
     return res.status(401).json({ error: "Authentication required" });
   }
   
   const session = sessions.get(sessionId);
   if (session.expiresAt < Date.now()) {
-    console.log('❌ requireAuth - Session expired');
     sessions.delete(sessionId);
     return res.status(401).json({ error: "Session expired" });
   }
@@ -449,24 +267,17 @@ app.use("/admin", (req, res, next) => {
                     req.query.session ||
                     req.cookies?.adminSession;
   
-  console.log('🔍 Admin middleware - Request URL:', req.url);
-  console.log('🔍 Admin middleware - Session ID:', sessionId);
-  console.log('🔍 Admin middleware - Cookie session:', req.cookies?.adminSession);
-  console.log('🔍 Admin middleware - Available sessions:', Array.from(sessions.keys()));
   
   if (!sessionId || !sessions.has(sessionId)) {
-    console.log('❌ Session not found, redirecting to login');
     return res.redirect('/login');
   }
   
   const session = sessions.get(sessionId);
   if (session.expiresAt < Date.now()) {
-    console.log('❌ Session expired, redirecting to login');
     sessions.delete(sessionId);
     return res.redirect('/login');
   }
   
-  console.log('✅ Session valid, proceeding to admin page');
   next();
 });
 
@@ -528,7 +339,6 @@ app.post("/api/login", authLimiter, [
       sameSite: 'strict'
     });
     
-    console.log(`✅ User logged in: ${username} from ${req.ip}`);
     
     res.json({
       success: true,
@@ -633,8 +443,6 @@ app.post("/api/change-password", requireAuth, authLimiter, [
     // Write updated credentials with error handling
     try {
       fs.writeFileSync(ADMIN_CREDENTIALS_FILE, JSON.stringify(credentials, null, 2));
-      console.log(`🔑 Password changed for user: ${username} from ${req.ip}`);
-      console.log(`📁 Credentials file updated: ${ADMIN_CREDENTIALS_FILE}`);
     } catch (error) {
       console.error('❌ Error writing updated credentials:', error);
       return res.status(500).json({ error: "Failed to save new password" });
@@ -736,24 +544,11 @@ app.post("/api/save-contact", limiter, [
       return res.status(500).json({ error: "Failed to save contact" });
     }
 
-    console.log(`✅ Contact saved: ${name} (${email}) from ${req.ip}`);
-
-    // Send email notification (async, don't wait for it)
-    sendContactEmail(newContact).then(emailResult => {
-      if (emailResult.success) {
-        console.log(`📧 Email notification sent for contact from ${name}`);
-      } else {
-        console.error(`❌ Failed to send email notification: ${emailResult.error}`);
-      }
-    }).catch(emailError => {
-      console.error('❌ Email sending error:', emailError);
-    });
 
     res.json({
       success: true,
       message: "Contact saved successfully",
-      id: newContact.id,
-      emailSent: true // Indicate that email was attempted
+      id: newContact.id
     });
   } catch (error) {
     console.error("Error saving contact:", error);
@@ -816,7 +611,6 @@ app.delete("/api/contacts/delete-all", requireAuth, (req, res) => {
     // Clear the contacts file
     fs.writeFileSync(CONTACTS_FILE, JSON.stringify([], null, 2));
     
-    console.log(`🗑️ All ${deletedCount} contacts deleted`);
     res.json({ 
       success: true, 
       message: "All contacts deleted successfully",
@@ -849,7 +643,6 @@ app.delete("/api/contacts/:id", requireAuth, (req, res) => {
     
     fs.writeFileSync(CONTACTS_FILE, JSON.stringify(contacts, null, 2));
     
-    console.log(`🗑️ Contact deleted: ID ${contactId}`);
     res.json({ 
       success: true, 
       message: "Contact deleted successfully",
@@ -1283,7 +1076,6 @@ app.get("/admin/contacts", requireAuth, (req, res) => {
                 }
               });
               
-              console.log('🔐 Browser navigation security enabled');
             })();
           </script>
         </body>
@@ -1302,9 +1094,6 @@ app.get("/admin/contacts", requireAuth, (req, res) => {
 // Initialize
 initContactsFile();
 
-// Initialize email service with secure credentials
-initializeEmailTransporter();
-verifyEmailConfiguration();
 
 // Global error handler
 app.use((err, req, res, next) => {
@@ -1337,26 +1126,15 @@ app.use((req, res, next) => {
 });
 
 // Start server
+let server;
 const startServer = async () => {
   try {
     // Initialize admin credentials
     await initAdminCredentials();
     
-    // Initialize email transporter
-    initializeEmailTransporter();
-    
-    // Verify email configuration
-    verifyEmailConfiguration();
-    
     // Start the server
-    const server = app.listen(PORT, () => {
-      console.log(`🚀 Portfolio server running on http://localhost:${PORT}`);
-      console.log(`📧 Contacts will be saved to: ${CONTACTS_FILE}`);
-      console.log(`🔐 Admin credentials: ${ADMIN_CREDENTIALS_FILE}`);
-      console.log(`🛡️ Security features enabled`);
-      console.log(`📧 Email service: ${transporter ? '✅ Active' : '❌ Inactive'}`);
-    });
-    
+    server = app.listen(PORT);
+
     return server;
   } catch (error) {
     console.error('❌ Failed to start server:', error);
@@ -1369,15 +1147,13 @@ startServer();
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
-  console.log('SIGTERM received, shutting down gracefully');
-  server.close(() => {
-    console.log('Process terminated');
-  });
+  if (server) {
+    server.close();
+  }
 });
 
 process.on('SIGINT', () => {
-  console.log('SIGINT received, shutting down gracefully');
-  server.close(() => {
-    console.log('Process terminated');
-  });
+  if (server) {
+    server.close();
+  }
 });

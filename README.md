@@ -10,9 +10,6 @@ Set these in your Render service settings:
 ```bash
 NODE_ENV=production
 PORT=3000
-EMAIL_USER=your-email@gmail.com
-EMAIL_PASS=your-gmail-app-password
-ENCRYPTION_KEY=your-custom-encryption-key-12345
 ```
 
 #### **2. Build Command**
@@ -70,9 +67,6 @@ In Render service settings → Environment:
 ```
 NODE_ENV=production
 PORT=3000
-EMAIL_USER=your-email@gmail.com
-EMAIL_PASS=your-gmail-app-password
-ENCRYPTION_KEY=your-unique-encryption-key-here
 ```
 
 #### **4. Deploy!**
@@ -100,32 +94,18 @@ ENCRYPTION_KEY=your-unique-encryption-key-here
 #### **Environment Variables Security:**
 - ✅ Never commit `.env` file
 - ✅ Use Render's encrypted environment variables
-- ✅ Generate strong encryption key
-- ✅ Use Gmail App Password (not regular password)
 
 #### **HTTPS/SSL:**
 - ✅ Render provides automatic HTTPS
 - ✅ SSL certificates managed automatically
 - ✅ Redirects HTTP to HTTPS
 
-### 📧 **EMAIL SETUP FOR RENDER:**
-
-#### **Gmail Configuration:**
-1. Enable 2-Step Verification on Gmail
-2. Create App Password: [Google App Passwords](https://myaccount.google.com/apppasswords)
-3. Use App Password in `EMAIL_PASS` environment variable
-
-#### **Alternative (Recommended for Production):**
-- **SendGrid** (free tier: 100 emails/day)
-- **Mailgun** (free tier: 5,000 emails/month)
-
 ### 🚨 **TROUBLESHOOTING:**
 
 #### **Common Issues:**
 1. **Port Issues**: Ensure `PORT=3000` in environment
-2. **Email Failures**: Check Gmail App Password setup
-3. **Build Failures**: Verify `package.json` scripts
-4. **Runtime Errors**: Check Render deployment logs
+2. **Build Failures**: Verify `package.json` scripts
+3. **Runtime Errors**: Check Render deployment logs
 
 #### **Debugging:**
 ```bash
@@ -170,12 +150,10 @@ NODE_ENV=production PORT=3000 npm start
 - [ ] Push all changes to GitHub
 - [ ] Create Render account
 - [ ] Set up environment variables
-- [ ] Test email configuration
 - [ ] Verify domain (if using custom)
 
 ### ✅ **After Deploy:**
 - [ ] Test all functionality
-- [ ] Check email notifications
 - [ ] Verify admin panel
 - [ ] Test mobile responsiveness
 - [ ] Set up monitoring (optional)
