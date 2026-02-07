@@ -3,9 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Harsh Kumar</title>
+    <title>Harsh Kumar | Software Engineer Portfolio</title>
+    <meta name="description" content="Harsh Kumar - Software Engineer portfolio featuring projects, experience, skills, and contact details." />
+    <meta name="theme-color" content="#111216" />
+    <meta property="og:title" content="Harsh Kumar | Software Engineer Portfolio" />
+    <meta property="og:description" content="Projects, experience, skills, and ways to connect with Harsh Kumar." />
+    <meta property="og:type" content="website" />
     <link rel="icon" type="image/jpeg" href="/assets/code.png" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -38,7 +42,7 @@
           <div class="hero-main" data-animate>
             <div class="hero-identity">
               <div class="profile-photo">
-                <img id="profilePhoto" src="" alt="Profile photo" />
+                <img id="profilePhoto" src="" alt="Profile photo" width="240" height="240" loading="eager" fetchpriority="high" decoding="async" />
               </div>
               <div class="hero-title">
                 <h1 id="profileName"></h1>
@@ -133,9 +137,9 @@
           <div class="contact-item">
             <p class="contact-label">🌐 Competitive view</p>
             <div class="social-dropdown">
-              <button class="dropdown-toggle" id="socialToggle">
+              <button class="dropdown-toggle" id="socialToggle" type="button" aria-expanded="false" aria-controls="socialMenu">
                 Select 🔗 
-                <i class="fas fa-chevron-down dropdown-icon"></i>
+                <span class="dropdown-icon" aria-hidden="true">▾</span>
               </button>
               <div class="dropdown-menu" id="socialMenu"></div>
             </div>
@@ -175,12 +179,15 @@
           <h3>💌 Let's Connect</h3>
           <form class="contact-form" id="contactForm">
             <div class="form-group">
-              <input type="text" id="contactName" placeholder="Your name" required />
+              <label class="sr-only" for="contactName">Your name</label>
+              <input type="text" id="contactName" placeholder="Your name" autocomplete="name" required />
             </div>
             <div class="form-group">
-              <input type="email" id="contactEmail" placeholder="Your email" required />
+              <label class="sr-only" for="contactEmail">Your email</label>
+              <input type="email" id="contactEmail" placeholder="Your email" autocomplete="email" required />
             </div>
             <div class="form-group">
+              <label class="sr-only" for="contactMessage">Your message</label>
               <textarea id="contactMessage" placeholder="Your message" rows="4" required></textarea>
             </div>
             <button type="submit" class="button button-small">📤 Send</button>
