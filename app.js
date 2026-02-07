@@ -235,10 +235,11 @@ const renderServices = (container, items) => {
 };
 
 const renderSocials = (container, items) => {
-  container.innerHTML = "";
   if (!items || items.length === 0) {
     return;
   }
+
+  container.innerHTML = "";
   
   const emojiMap = {
     LinkedIn: "💼",
