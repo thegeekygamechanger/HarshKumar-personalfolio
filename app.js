@@ -235,10 +235,11 @@ const renderServices = (container, items) => {
 };
 
 const renderSocials = (container, items) => {
-  container.innerHTML = "";
   if (!items || items.length === 0) {
     return;
   }
+
+  container.innerHTML = "";
   
   const emojiMap = {
     LinkedIn: "💼",
@@ -456,12 +457,14 @@ const initSocialDropdown = () => {
   if (!toggle || !dropdown) return;
   
   toggle.addEventListener("click", () => {
-    dropdown.classList.toggle("open");
+    const isOpen = dropdown.classList.toggle("open");
+    toggle.setAttribute("aria-expanded", String(isOpen));
   });
   
   document.addEventListener("click", (event) => {
     if (!dropdown.contains(event.target)) {
       dropdown.classList.remove("open");
+      toggle.setAttribute("aria-expanded", "false");
     }
   });
 };
@@ -554,16 +557,11 @@ const saveContactResponse = async (response) => {
     });
 
     if (res.ok) {
-      const data = await res.json();
-      console.log("✅ Contact saved to server:", data);
+      await res.json();
     } else {
       console.error("Server error:", res.status);
     }
-  } catch (error) {
-    console.log(
-      "⚠️ Backend not available - using localStorage only. Start server with: npm start",
-      error
-    );
+  } catch {
   }
 };
 
@@ -597,7 +595,6 @@ const initDownloadContact = () => {
     e.stopPropagation();
     
     if (isDownloading) {
-      console.log('Download already in progress...');
       return;
     }
     
@@ -641,7 +638,6 @@ END:VCARD`;
         newBtn.textContent = '⬇️ Download Contact';
       }, 100);
       
-      console.log('✅ vCard downloaded successfully');
     } catch (error) {
       console.error('Error downloading vCard:', error);
       alert('Unable to download contact card. Please try again.');
